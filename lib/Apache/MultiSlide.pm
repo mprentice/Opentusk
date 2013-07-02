@@ -18,7 +18,7 @@ package Apache::MultiSlide;
 use strict;
 use Apache2::Const qw(:common);
 use Apache::Log;
-use Image::Magick;
+# use Image::Magick;
 use TUSK::Content::MultiContentManager;
 
 sub handler {

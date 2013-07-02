@@ -57,9 +57,9 @@ use_dynamic_wrapper => 0
 
 <%once>
 use HSDB4::SQLRow::User;
-use Apache2::Const qw/REDIRECT NOT_FOUND/;
-use Apache2::Cookie;
-use ModPerl::Util;
+# use Apache2::Const qw/REDIRECT NOT_FOUND/;
+# use Apache2::Cookie;
+# use ModPerl::Util;
 use Data::Dumper;
 use TUSK::Session;
 use TUSK::Core::Logger;
@@ -75,107 +75,108 @@ sub pre_dump{
 	print "<pre>" . Dumper($args) . "</pre>";
 }
 
-my $authentication = sub {
-	my $home_url = '/home?url=' . $m->{top_path};
-	if ( $m->comp('/tmpl/url:get_full_path') ) {
-		$home_url .= "/" . $m->comp('/tmpl/url:get_full_path');
-	}
+my $authentication = sub { undef };
+# my $authentication = sub {
+# 	my $home_url = '/home?url=' . $m->{top_path};
+# 	if ( $m->comp('/tmpl/url:get_full_path') ) {
+# 		$home_url .= "/" . $m->comp('/tmpl/url:get_full_path');
+# 	}
 
-	my ($user, $user_id);
-	unless ($user_id = $r->user) {
-		my $cookieJar = Apache2::Cookie::Jar->new($r);
-		if (defined ($cookieJar->cookies('Ticket'))){
-			my %ticket = $cookieJar->cookies('Ticket')->value;
-			$user_id = Apache::TicketTool::get_user_from_ticket(\%ticket);
-		}
-	}
-	if (!$user_id){ # redirect to login page
-		$r->headers_out->set('Location', $home_url . '&errmsg=Please+login');
-		$r->status(REDIRECT);
-		$m->abort(REDIRECT);
-	}
-	# If user is not an HSDB4::SQLRow::User or (we are not a ghost user and user_id ne user_id from obj)
-	if (
-		(ref($m->session->{'user'}) ne 'HSDB4::SQLRow::User') ||
-		(!$m->session->{'user'}->isGhost && ($user_id ne $m->session->{'user'}->user_id()))
-	) {
-		my $shibUserID = -1;
-		if($user_id && !$m->session->{'user'}) {$m->session->{'user'} = $user_id;}
-        	$shibUserID = TUSK::Shibboleth::User->isShibUser($m->session->{'user'});
-		$user = HSDB4::SQLRow::User->new();
-        	if(($shibUserID > -1) && ($m->base_comp->attr('allow_shib') == 1)) {
-			# If we are a shib user and we are allowing shib users then make a ghost user
-                	$user->makeGhost($shibUserID);
-		} else {
-			# Otherwise look up the user id which will be nothing for a shib user or a guest
-			$user->lookup_key($user_id);
-		}
+# 	my ($user, $user_id);
+# 	unless ($user_id = $r->user) {
+# 		my $cookieJar = Apache2::Cookie::Jar->new($r);
+# 		if (defined ($cookieJar->cookies('Ticket'))){
+# 			my %ticket = $cookieJar->cookies('Ticket')->value;
+# 			$user_id = Apache::TicketTool::get_user_from_ticket(\%ticket);
+# 		}
+# 	}
+# 	if (!$user_id){ # redirect to login page
+# 		$r->headers_out->set('Location', $home_url . '&errmsg=Please+login');
+# 		$r->status(REDIRECT);
+# 		$m->abort(REDIRECT);
+# 	}
+# 	# If user is not an HSDB4::SQLRow::User or (we are not a ghost user and user_id ne user_id from obj)
+# 	if (
+# 		(ref($m->session->{'user'}) ne 'HSDB4::SQLRow::User') ||
+# 		(!$m->session->{'user'}->isGhost && ($user_id ne $m->session->{'user'}->user_id()))
+# 	) {
+# 		my $shibUserID = -1;
+# 		if($user_id && !$m->session->{'user'}) {$m->session->{'user'} = $user_id;}
+#         	$shibUserID = TUSK::Shibboleth::User->isShibUser($m->session->{'user'});
+# 		$user = HSDB4::SQLRow::User->new();
+#         	if(($shibUserID > -1) && ($m->base_comp->attr('allow_shib') == 1)) {
+# 			# If we are a shib user and we are allowing shib users then make a ghost user
+#                 	$user->makeGhost($shibUserID);
+# 		} else {
+# 			# Otherwise look up the user id which will be nothing for a shib user or a guest
+# 			$user->lookup_key($user_id);
+# 		}
 
-		if(!$user->primary_key) {
-			# Returen that we are an unknown user
-			unless($m->base_comp->attr('allow_guests') == 1) {
-				$r->headers_out->set('Location',$home_url . '&errmsg=Please+login');
-				$r->status(REDIRECT);
-				$m->abort(REDIRECT);
-			}
-		}
-		$m->session->{'user'} = $user;
-	}
+# 		if(!$user->primary_key) {
+# 			# Returen that we are an unknown user
+# 			unless($m->base_comp->attr('allow_guests') == 1) {
+# 				$r->headers_out->set('Location',$home_url . '&errmsg=Please+login');
+# 				$r->status(REDIRECT);
+# 				$m->abort(REDIRECT);
+# 			}
+# 		}
+# 		$m->session->{'user'} = $user;
+# 	}
 			
-	if ($m->base_comp->attr('check_cms_permissions')){
-		my $typeObj = $m->comp("/tmpl/url:get_type_object");
-		if (ref($typeObj) eq "HSDB45::Course"){
-			unless (TUSK::Session::is_school_admin($m->session, $typeObj->school(), $m->session->{'user'})){
-				if ($m->comp("SELF:check_course_permissions", token => 'AUTHOR') == 0){
-					$r->headers_out->set('Location','/home?errmsg=Access+Denied');
-					$r->status(REDIRECT);
-					$m->abort(REDIRECT);
-				}
-			}
-		}
-	}
+# 	if ($m->base_comp->attr('check_cms_permissions')){
+# 		my $typeObj = $m->comp("/tmpl/url:get_type_object");
+# 		if (ref($typeObj) eq "HSDB45::Course"){
+# 			unless (TUSK::Session::is_school_admin($m->session, $typeObj->school(), $m->session->{'user'})){
+# 				if ($m->comp("SELF:check_course_permissions", token => 'AUTHOR') == 0){
+# 					$r->headers_out->set('Location','/home?errmsg=Access+Denied');
+# 					$r->status(REDIRECT);
+# 					$m->abort(REDIRECT);
+# 				}
+# 			}
+# 		}
+# 	}
 
-	if ($m->base_comp->attr('check_permissions_by_context')){
-		my $typeObj = $m->comp("/tmpl/url:get_type_object");
+# 	if ($m->base_comp->attr('check_permissions_by_context')){
+# 		my $typeObj = $m->comp("/tmpl/url:get_type_object");
 
-		## if context is a course, only give access if user has role equal or above what the "check_permissions_by_context" attribute has been set to
-		if (ref($typeObj) eq "HSDB45::Course") {
-			unless (TUSK::Session::is_school_admin($m->session, $typeObj->school(), $m->session->{'user'})) {
-				if ($m->comp("SELF:check_course_permissions", token => $m->base_comp->attr('check_permissions_by_context')) == 0) {
-					$m->redirect('/home?errmsg=Access+Denied');
-				}
-			}
-		}
-		## otherwise, make sure user is a school admin
-		else {
-			unless (TUSK::Session::is_school_admin($m->session, $m->comp("/tmpl/url:get_school"), $m->session->{'user'})) {
-				$m->redirect('/home?errmsg=Access+Denied');
-			}
-		}
-	}
+# 		## if context is a course, only give access if user has role equal or above what the "check_permissions_by_context" attribute has been set to
+# 		if (ref($typeObj) eq "HSDB45::Course") {
+# 			unless (TUSK::Session::is_school_admin($m->session, $typeObj->school(), $m->session->{'user'})) {
+# 				if ($m->comp("SELF:check_course_permissions", token => $m->base_comp->attr('check_permissions_by_context')) == 0) {
+# 					$m->redirect('/home?errmsg=Access+Denied');
+# 				}
+# 			}
+# 		}
+# 		## otherwise, make sure user is a school admin
+# 		else {
+# 			unless (TUSK::Session::is_school_admin($m->session, $m->comp("/tmpl/url:get_school"), $m->session->{'user'})) {
+# 				$m->redirect('/home?errmsg=Access+Denied');
+# 			}
+# 		}
+# 	}
 
-	if ($m->base_comp->attr('must_be_school_admin')){
-		unless (TUSK::Session::is_school_admin($m->session, $m->comp("/tmpl/url:get_school"), $m->session->{'user'})){
-			$m->redirect('/home?errmsg=Access+Denied');
-		}
+# 	if ($m->base_comp->attr('must_be_school_admin')){
+# 		unless (TUSK::Session::is_school_admin($m->session, $m->comp("/tmpl/url:get_school"), $m->session->{'user'})){
+# 			$m->redirect('/home?errmsg=Access+Denied');
+# 		}
 		
-	}
+# 	}
 
-	if ($m->base_comp->attr('must_be_eval_admin')){
-		unless (TUSK::Session::is_school_eval_admin($m->session, $m->comp("/tmpl/url:get_school"), $m->session->{'user'})){
-			$m->redirect('/home?errmsg=Access+Denied');
-		}
+# 	if ($m->base_comp->attr('must_be_eval_admin')){
+# 		unless (TUSK::Session::is_school_eval_admin($m->session, $m->comp("/tmpl/url:get_school"), $m->session->{'user'})){
+# 			$m->redirect('/home?errmsg=Access+Denied');
+# 		}
 		
-	}
+# 	}
 
-	if ($m->base_comp->attr('must_be_tusk_admin')) {
-		unless(TUSK::Session::is_tusk_admin($m->session->{'user'}->primary_key)) {
-			$m->redirect('/home?errmsg=Access+Denied');
-		}
-	}
+# 	if ($m->base_comp->attr('must_be_tusk_admin')) {
+# 		unless(TUSK::Session::is_tusk_admin($m->session->{'user'}->primary_key)) {
+# 			$m->redirect('/home?errmsg=Access+Denied');
+# 		}
+# 	}
 	
-	return undef;
-};
+# 	return undef;
+# };
 
 </%once>
 
@@ -303,18 +304,18 @@ my %req_hash = ( user => $localUser,
 
 <%method nocache>
 <%perl>
-	$r->headers_out->set('Expires','Mon, 1 Jan 1990 05:00:00 GMT' );
-	$r->headers_out->set('Pragma','no-cache');
-	$r->headers_out->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0');
+	# $r->headers_out->set('Expires','Mon, 1 Jan 1990 05:00:00 GMT' );
+	# $r->headers_out->set('Pragma','no-cache');
+	# $r->headers_out->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0');
 </%perl>
 </%method>
 
 <%method set_no_cache>
 	<%perl>
-                $r->headers_out->add('Expires',"Mon, 26 Jul 1997 05:00:00 GMT");
-                $r->headers_out->add('Last-Modified',time2str(time));
-                $r->headers_out->add('Cache-Control'," no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-                $r->headers_out->add('Pragma', "no-cache");
+                # $r->headers_out->add('Expires',"Mon, 26 Jul 1997 05:00:00 GMT");
+                # $r->headers_out->add('Last-Modified',time2str(time));
+                # $r->headers_out->add('Cache-Control'," no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+                # $r->headers_out->add('Pragma', "no-cache");
 
                 push @metaData, "<META HTTP-EQUIV=\"cache-control\" CONTENT=\"no-cache\">\n";
                 push @metaData, "<META HTTP-EQUIV=\"pragma\" CONTENT=\"no-cache\">\n";

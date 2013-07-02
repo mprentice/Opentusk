@@ -1,0 +1,27 @@
+Notes for installing on Mac OS X Mountain Lion:
+
+* GD graph drawing library
+
+With homebrew:
+
+  brew install libgd
+
+GD test is failing. Can force with:
+
+  cpanm --force GD
+
+
+* Image::Magick error
+
+No solution yet.
+
+
+* XML::LibXSLT install error
+
+To fix the error 'libxml/tree.h' file not found add libxml2 to the C
+include path:
+
+  ln -s /usr/include/libxml2/libxml /usr/local/include/libxml
+
+This is not an ideal solution!
+

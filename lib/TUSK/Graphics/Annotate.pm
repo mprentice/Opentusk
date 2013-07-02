@@ -16,7 +16,7 @@
 package TUSK::Graphics::Annotate;
 
 use strict;
-use Image::Magick;
+# use Image::Magick;
 use HSDB4::SQLRow::Content;
 use Carp;
 

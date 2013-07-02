@@ -1,0 +1,48 @@
+# Apache2::Request
+# Apache::DBI
+# Apache::Session::Wrapper
+Archive::Zip
+DBD::mysql
+DBI
+Date::Calc
+Date::Manip
+Devel::Size
+Email::Date::Format
+File::Type
+GD
+GD::Text
+HTML::Defang
+HTML::Mason
+HTML::Mason::PlackHandler
+HTML::Strip
+# Image::Magick
+IO::Scalar
+IO::Stringy
+Image::ExifTool
+Image::Size
+JSON
+Linux::Pid
+Locale::TextDomain
+Log::Any
+Log::Log4perl
+MIME::Lite
+Mail::Sendmail
+MasonX::Request::WithApacheSession
+Moose
+Net::LDAPS
+Parse::RecDescent
+Plack::Builder
+Proc::ProcessTable
+Spreadsheet::WriteExcel
+Sys::MemInfo
+Task::Plack
+Term::ReadKey
+Test::Base
+Test::Deep
+Unicode::String
+Unicode::String
+XML::LibXSLT
+XML::Parser
+XML::SAX::Writer
+XML::Twig
+YAML

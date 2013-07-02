@@ -28,7 +28,8 @@ Library that contains methods that deal with parsing the url and handling redire
 <%shared>
 	my ($type_path, $type_object);
 	my $initial_nav_bars = [];
-	my $url_path =  $r->path_info();
+        my $url_path = '';
+	# my $url_path =  $r->path_info();
 	$url_path =~ s|^/||
 		if ( $url_path =~ m|^/| ); # take away the prepending / and then split 
 	my $path_ids = [ split('/', $url_path) ];
@@ -327,9 +328,9 @@ $additional_args => ''
 <%perl>
 	my $params_hash = {};
 
-	foreach my $param ($r->param) {
-		$params_hash->{$param} = $r->param($param); 
-	}
+	# foreach my $param ($r->param) {
+	# 	$params_hash->{$param} = $r->param($param); 
+	# }
 	
 	return $params_hash if ($return_ref);
 	return %$params_hash;

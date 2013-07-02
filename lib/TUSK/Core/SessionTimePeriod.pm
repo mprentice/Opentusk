@@ -43,7 +43,7 @@ sub course_time_periods{
 	else{
 		$timeperiod = get_time_period($course, $session);
 		if ($timeperiod == -1){
-			$session->{timeperiod} = $timeperiod = @$periods[length(@$periods) -1]->primary_key;
+			$session->{timeperiod} = $timeperiod = @$periods[scalar(@$periods) -1]->primary_key;
 		}
 		delete $session->{selected_timeperiod_display};
     }
@@ -81,7 +81,7 @@ sub show_dropdown_without_course{
 			$timeperiod = $session->{timeperiod};
 		}
 		else{
-			$session->{timeperiod} = $timeperiod = @$periods[length(@$periods) -1]->primary_key;
+			$session->{timeperiod} = $timeperiod = @$periods[scalar(@$periods) -1]->primary_key;
 			delete $session->{selected_timeperiod_display};
 		}
 

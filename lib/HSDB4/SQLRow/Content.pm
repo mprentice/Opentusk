@@ -41,7 +41,7 @@ use TUSK::Content::External::MetaData;
 use TUSK::Course;
 use TUSK::Session;
 use Carp;
-use Image::Magick;
+# use Image::Magick;
 use TUSK::ProcessTracker::ProcessTracker;
 
 use POSIX 'setsid';

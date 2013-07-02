@@ -18,7 +18,7 @@ package HSDB4::Image;
 use strict;
 use IO::File;
 use FileHandle;
-use Image::Magick;
+# use Image::Magick;
 use Image::Size;
 
 use vars ('%Types');

@@ -28,7 +28,7 @@ nostandardheader => 1
 <%once>
 use TUSK::Constants;
 use TUSK::Functions;
-use Apache2::Cookie;
+# use Apache2::Cookie;
 </%once>
 
 <%args>
@@ -65,15 +65,16 @@ if(exists($logoHash{$date})  && -f $TUSK::Constants::BaseStaticPath . $logoHash{
 
 <%perl>
 # see if there is a 
-my $cookieJar = Apache2::Cookie::Jar->new($r);
-my $message = $cookieJar->cookies('login_error') && $cookieJar->cookies('login_error')->value() ? $cookieJar->cookies('login_error')->value()
-                  : $errmsg ? $errmsg
-                  : '';
-my $failedLoginUser = $cookieJar->cookies('failed_login_user') && $cookieJar->cookies('failed_login_user')->value() ? $cookieJar->cookies('failed_login_user')->value()
-                  : $user ? $user
-                  : '';
+# my $cookieJar = Apache2::Cookie::Jar->new($r);
+# my $message = $cookieJar->cookies('login_error') && $cookieJar->cookies('login_error')->value() ? $cookieJar->cookies('login_error')->value()
+#                   : $errmsg ? $errmsg
+#                   : '';
+# my $failedLoginUser = $cookieJar->cookies('failed_login_user') && $cookieJar->cookies('failed_login_user')->value() ? $cookieJar->cookies('failed_login_user')->value()
+#                   : $user ? $user
+#                   : '';
+my $failedLoginUser = '';
+my $message = '';
 </%perl>
-
 
 
 
@@ -140,7 +141,8 @@ $failedLoginUser => ''
 <p class="xxsm">If you believe you got this message in error please <a href="<% $prefix %>/about/contact_us">contact us</a></p>
 % }
 </div>
-% my $ssrv = $r->dir_config('SecureLogin') || 'https://'.$TUSK::Constants::Domain.'/login';
+%# my $ssrv = $r->dir_config('SecureLogin') || 'https://'.$TUSK::Constants::Domain.'/login';
+% my $ssrv = '/login';
 
 <& /tmpl/element:form, params => { action => $ssrv, method => 'post', name => 'login'} &>
 

@@ -18,7 +18,7 @@ package Apache::HSDBSlide;
 use strict;
 use Apache2::Const qw(:common);
 use Apache2::Log;
-use Image::Magick;
+# use Image::Magick;
 use HSDB4::SQLRow::Content;
 
 sub handler {

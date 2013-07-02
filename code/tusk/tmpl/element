@@ -1803,9 +1803,9 @@ else{
 
 <%method nocache>
 <%perl>
-	$r->headers_out->set('Expires','Mon, 1 Jan 1990 05:00:00 GMT' );
-    $r->headers_out->set('Pragma','no-cache');
-	$r->headers_out->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0');
+    #     $r->headers_out->set('Expires','Mon, 1 Jan 1990 05:00:00 GMT' );
+    # $r->headers_out->set('Pragma','no-cache');
+    #     $r->headers_out->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0');
 </%perl>
 </%method>
 
