@@ -138,7 +138,7 @@ sub course_time_periods_emb{
 	else{
 		$timeperiod = get_time_period($req, $udat);
 		if ($timeperiod==-1){
-			$udat->{timeperiod} = $timeperiod = @$periods[length(@$periods) -1]->primary_key;
+			$udat->{timeperiod} = $timeperiod = @$periods[scalar(@$periods) -1]->primary_key;
 		}
 		delete($udat->{selected_timeperiod_display});
 	}
@@ -188,7 +188,7 @@ sub course_time_periods{
 	else{
 		$timeperiod = get_time_period($req, $udat);
 		if ($timeperiod==-1){
-			$udat->{timeperiod} = $timeperiod = @$periods[length(@$periods) -1]->primary_key;
+			$udat->{timeperiod} = $timeperiod = @$periods[scalar(@$periods) -1]->primary_key;
 		}
 		delete($udat->{selected_timeperiod_display});
 	}
