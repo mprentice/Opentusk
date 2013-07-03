@@ -25,3 +25,15 @@ include path:
 
 This is not an ideal solution!
 
+
+* DBD::mysql install error
+
+  export DYLD_LIBRARY_PATH="/usr/local/mysql/lib:$DYLD_LIBRARY_PATH"
+
+
+* tusk.conf
+
+  cp install/templates/conf/tusk/tusk.conf conf/tusk.conf
+
+Edit tusk.conf to replace the Domain and add your hostname to the
+Middleware->Servers section.
