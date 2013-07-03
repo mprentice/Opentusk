@@ -17,7 +17,7 @@ sub main {
     while (my $pkg = <>) {
         chomp $pkg;
         next if $pkg =~ m/^ *#/;
-        system 'cpanm', $pkg;
+        system('cpanm', $pkg) or die "Error installing $pkg: $!";
     }
 }
 
