@@ -28,12 +28,12 @@ my $icons_app = Plack::App::File->new(
 )->to_app;
 
 builder {
-    mount "/" => sub {
-        my $env = shift;
-        $mason_app->handle_request($env);
-    };
     mount "/style"    => $styles_app;
     mount "/graphics" => $graphics_app;
     mount "/icons"    => $icons_app;
     mount "/scripts"  => $scripts_app;
+    mount "/" => sub {
+        my $env = shift;
+        $mason_app->handle_request($env);
+    };
 };
