@@ -20,22 +20,22 @@ if [[ -d /vagrant ]] ; then
     if [[ ! -L $base_dir ]] ; then
         /bin/ln -s /vagrant $base_dir
     fi
-    if [[ -z "`grep vagrant-c5-x86_64 /etc/hosts`" ]]; then
-        /bin/echo -e "192.168.56.150\tvagrant-c5-x86_64" >> /etc/hosts
+    if [[ -z "`grep $HOSTNAME /etc/hosts`" ]]; then
+        /bin/echo -e "${myipaddr}\t${myhost}" >> /etc/hosts
     fi
 fi
 
 PERL5LIB="$base_dir/lib:$PERL5LIB"
 
-/bin/echo "[$sn] Adding opentusk repo ..."
-/bin/cp $centos_dir/opentusk.repo /etc/yum.repos.d
+# /bin/echo "[$sn] Adding opentusk repo ..."
+# /bin/cp $centos_dir/opentusk.repo /etc/yum.repos.d
 
-/bin/echo "[$sn] Installing yum packages (takes a while) ..."
-/bin/bash $centos_dir/install_yum_packages.bash
+# /bin/echo "[$sn] Installing yum packages (takes a while) ..."
+# /bin/bash $centos_dir/install_yum_packages.bash
 
-/bin/echo "[$sn] Setting SELinux to permissive ..."
-/bin/sed -i 's/^\s*SELINUX=.*$/SELINUX=permissive/g' /etc/selinux/config
-/usr/sbin/setenforce Permissive
+# /bin/echo "[$sn] Setting SELinux to permissive ..."
+# /bin/sed -i 's/^\s*SELINUX=.*$/SELINUX=permissive/g' /etc/selinux/config
+# /usr/sbin/setenforce Permissive
 
 /bin/echo "[$sn] Setting up TUSK system account ..."
 /bin/bash $centos_dir/create_system_accounts.bash
@@ -54,7 +54,7 @@ PERL5LIB="$base_dir/lib:$PERL5LIB"
 
 /bin/echo "[$sn] Setting up MySQL and loading TUSK databases ..."
 if [[ `/sbin/service mysqld status` =~ "stopped" ]] ; then
-    /sbin/service mysqld start &>/dev/null
+    /sbin/service mysqld start
 fi
 /sbin/chkconfig mysqld on
 function _grant_mysql {
@@ -95,11 +95,39 @@ EOF
     /bin/sed -i "s/MYFQDN/`hostname`/g" {} \;
 /usr/bin/find /etc/httpd/conf.d/ -name "*.conf" -exec \
     /bin/sed -i "s/TUSKFQDN/`hostname`/g" {} \;
-/sbin/service httpd start &>/dev/null
+/sbin/service httpd start
 /sbin/chkconfig httpd on
 
+/bin/echo "[$sn] Setting firewall to allow http and https ..."
+/bin/mv /etc/sysconfig/iptables /etc/sysconfig/iptables.bak
+/bin/cat <<EOF > /etc/sysconfig/iptables
+# Firewall configuration written by vagrant for OpenTUSK
+# Manual customization of this file is not recommended.
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:RH-Firewall-1-INPUT - [0:0]
+-A INPUT -j RH-Firewall-1-INPUT
+-A FORWARD -j RH-Firewall-1-INPUT
+-A RH-Firewall-1-INPUT -i lo -j ACCEPT
+-A RH-Firewall-1-INPUT -p icmp --icmp-type any -j ACCEPT
+-A RH-Firewall-1-INPUT -p 50 -j ACCEPT
+-A RH-Firewall-1-INPUT -p 51 -j ACCEPT
+-A RH-Firewall-1-INPUT -p udp --dport 5353 -d 224.0.0.251 -j ACCEPT
+-A RH-Firewall-1-INPUT -p udp -m udp --dport 631 -j ACCEPT
+-A RH-Firewall-1-INPUT -p tcp -m tcp --dport 631 -j ACCEPT
+-A RH-Firewall-1-INPUT -p tcp -m tcp --dport 80 -j ACCEPT 
+-A RH-Firewall-1-INPUT -p tcp -m tcp --dport 443 -j ACCEPT 
+-A RH-Firewall-1-INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+-A RH-Firewall-1-INPUT -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+EOF
+/sbin/service iptables restart
+
 /bin/echo "[$sn] Setting up crontabs ..."
-/bin/su tusk -c "/usr/bin/perl $base_dir/bin/fts_index --all &>/dev/null"
+/bin/su tusk -c "/usr/bin/perl $base_dir/bin/fts_index --all"
 cat <<EOF > /usr/local/tusk/crontab
 ### Session Tracking
 1 1 * * * $base_dir/bin/clean_session_table 2>&1 | $base_dir/bin/mail_cron_error "Old Session Cleaner"
@@ -121,11 +149,15 @@ cat <<EOF > /usr/local/tusk/crontab
 EOF
 /usr/bin/crontab -u tusk /usr/local/tusk/crontab
 
+# Enable network adapter 1
+/bin/sed -i 's/ONBOOT=.*/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth1
+/sbin/ifconfig eth1 up
+
 /bin/echo "[$sn] Finished setup."
 /bin/echo "[$sn] Add `hostname` to /etc/hosts on your VM host."
 /usr/bin/printf \
     "[%s] Mac: /usr/bin/sudo /bin/bash -c \"%s >> /private/etc/hosts\"\n" \
     "$sn" \
-    "/usr/bin/printf \\\"%s\\\t%s\\\n\\\" \\\"192.168.56.150\\\" \\\"`hostname`\\\""
+    "/usr/bin/printf \\\"%s\\\t%s\\\n\\\" \\\"${myipaddr}\\\" \\\"${myhost}\\\""
 /bin/echo "[$sn] (Only needed once.)"
-/bin/echo "[$sn] Then connect to http://`hostname` to test."
+/bin/echo "[$sn] Then connect to http://${myhost} to test."

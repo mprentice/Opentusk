@@ -11,11 +11,11 @@ Vagrant.configure("2") do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "centos58_64"
+  config.vm.box = "tusk-centos-5_x64"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "http://tag1consulting.com/files/centos-5.8-x86-64-minimal.box"
+  config.vm.box_url = "http://repo4.tusk.tufts.edu/images/tusk-centos-5_x64-vagrant-vbox.box"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
   # using a specific IP.
   config.vm.network :private_network, ip: "192.168.56.150"
 
-  config.vm.provision :shell, :path => "install/vagrant/bootstrap-centos-5.8.sh"
+  config.vm.provision :shell, :path => "install/vagrant/bootstrap-centos-5.sh"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
