@@ -6,3 +6,5 @@ logs/
 logs
 install/packer/packer_cache
 install/packer/*.box
+*#
+.#*
