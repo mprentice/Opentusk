@@ -30,10 +30,11 @@ Thought it would be nice to have a generic way for our cron scripts to log
 use strict;
 use Carp qw(confess);
 use FindBin;
+use TUSK::Constants;
 
 my $handle;
 
-my $logdir = "$FindBin::Bin/../logs";
+my $logdir = $TUSK::Constants::LogRoot;
 
 #######################################################
 
