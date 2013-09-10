@@ -1,0 +1,54 @@
+{
+    "builders": [
+        {
+            "name": "tusk-centos-5_x64-vagrant-vbox",
+            "vm_name": "tusk-centos-5_x64",
+            "type": "virtualbox",
+            "guest_os_type": "RedHat_64",
+            "iso_url": "http://mirrors.usinternet.com/centos/5/isos/x86_64/CentOS-5.9-x86_64-netinstall.iso",
+            "iso_checksum": "0f6d85b6a866c50fc89185f0402cb0fe0d942c62832b9359ca07eec3f6ea6ed8",
+            "iso_checksum_type": "sha256",
+            "ssh_username": "root",
+            "ssh_password": "vagrant",
+            "ssh_wait_timeout": "20m",
+            "shutdown_command": "/sbin/shutdown -h now",
+            "disk_size": 40000,
+            "http_directory": "www",
+            "vboxmanage": [
+                ["modifyvm", "{{.Name}}", "--memory", "1024"],
+                ["guestproperty", "set", "{{.Name}}",
+                 "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold",
+                 "1000"]
+            ],
+            "boot_wait": "10s",
+            "boot_command": [
+                "<esc>",
+                "<wait>linux ks=http://{{.HTTPIP}}:{{.HTTPPort}}/centos-5_x64-vagrant-vbox-ks.cfg<enter>"
+            ]
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "script": "provisioners/centos-5_x64/install-packages.sh"
+        },
+        {
+            "type": "shell",
+            "script": "provisioners/centos-5_x64/install-vbox-guest-additions.sh"
+        },
+        {
+            "type": "shell",
+            "script": "provisioners/centos-5_x64/vagrant.sh"
+        },
+        {
+            "type": "shell",
+            "script": "provisioners/centos-5_x64/clean-empty-space.sh"
+        }
+    ],
+    "post-processors": [
+        {
+            "type": "vagrant",
+            "output": "tusk-centos-5_x64-vagrant-vbox.box"
+        }
+    ]
+}
