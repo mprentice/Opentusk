@@ -24,3 +24,6 @@ clean:
 	rm -rf "$(HOME)/VirtualBox VMs/$(vboxname)" || true
 	rm -f $(vboxname)-vagrant-vbox.box || true
 	sed -i".bak" '/$(vboxname)/d' "$(HOME)/Library/VirtualBox/VirtualBox.xml"
+
+clean-all: clean
+	rm -rf packer_cache
