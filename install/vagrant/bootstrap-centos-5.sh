@@ -2,12 +2,15 @@
 
 # Installing OpenTUSK and EPEL repos
 
-set -e
+set -o errexit
 
 sn=`basename $0`
 base_dir="/usr/local/tusk/current"
 install_dir="$base_dir/install"
-centos_dir="$install_dir/centos-5.8"
+centos_dir="$install_dir/centos-5"
+
+myhost="$HOSTNAME"
+myipaddr=`ifconfig eth1 | grep -o 'inet addr:\([0-9.]\+\)' | cut -d: -f2`
 
 /bin/echo "[$sn] Configuring from Vagrant bootstrap ..."
 if [[ -d /vagrant ]] ; then
@@ -68,9 +71,9 @@ _grant_mysql 'vagrant' '%' 'vagrant' 'with grant option'
 _grant_mysql 'vagrant' 'localhost' 'vagrant' 'with grant option'
 _grant_mysql 'content_mgr' 'localhost' 'vagrant'
 _grant_mysql 'tusk' 'localhost' 'vagrant'
-/usr/bin/perl $install_dir/bin/baseline.pl \
-    --create-admin --create-school --dbuser=root &>/dev/null
-/usr/bin/perl $base_dir/bin/upgrade.pl --all --dbuser=root
+/usr/bin/perl $base_dir/bin/db/baseline.pl \
+    --create-admin --create-school --dbuser=root
+/usr/bin/perl $base_dir/bin/db/upgrade.pl --all --dbuser=root
 cat <<EOF > /usr/local/tusk/.my.cnf
 [client]
 user=tusk
