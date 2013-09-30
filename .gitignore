@@ -8,3 +8,5 @@ install/packer/packer_cache
 install/packer/*.box
 *#
 .#*
+conf/tusk.conf
+conf/local.cfg
