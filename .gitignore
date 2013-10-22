@@ -1,5 +1,4 @@
 mason_cache/*
-logs/
 etc/tusk.conf
 .vagrant
 logs/
@@ -10,3 +9,4 @@ install/packer/*.box
 .#*
 conf/tusk.conf
 conf/local.cfg
+*~
